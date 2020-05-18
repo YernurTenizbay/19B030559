@@ -46,7 +46,7 @@ rad = pi/180
 count=1
 class Menu():
     
-    def __init__(self,items=[120,140,u'Punkt',(250,250,30),(250,30,250),0]):
+    def __init__(self,items=[120,140,u'item',(250,250,30),(250,30,250),0]):
         self.items=items
         
     def render(self,poverhnost,font,num_item):
@@ -508,7 +508,7 @@ def Single_tank():
     run = 1
     emag=True
     timer=0
-    
+    timer2=0
     gmg=False
     while run:
 
@@ -541,10 +541,17 @@ def Single_tank():
         if k==1:
             walls.append(Wall(j*16,i*16))
         if timer%150==0:
-            tank.vel=100
-            tank2.vel=100
-            tank.food_dir=False
-            foods.append(Food(M*24,l*24))   
+
+            foods.append(Food(M*24,l*24)) 
+        if  tank.food_dir==True:
+            timer2+=1
+            if timer2==150:
+                tank.vel=100
+                tank2.vel=100
+                tank.food_dir=False
+                timer2=0
+                print('ex')
+
             
         window.blit(Font.render(f"Hp:{tank.hp}",1,(0,255,0)),(0,0))
         window.blit(Font.render(f"Hp:{tank2.hp}",1,(255,0,0)),(960,0))
@@ -1177,6 +1184,7 @@ def Multi_AI():
             self.channel.start_consuming() 
         def close(self):
             self.channel.close() 
+    
     client=TankRpcClient()
     client.check_server_status()
     client.obtain_token('room-10')
@@ -1305,9 +1313,8 @@ def Multi_AI():
             window.blit(myscore,myscore_rect)
 
 
-
     
-
+    direct='' 
     ctimer=0
     UP='UP'
     DOWN='DOWN'
@@ -1316,6 +1323,7 @@ def Multi_AI():
 
     run=True
     gmg=False
+    shot=False
     data={}
     data_win={}
     data_lose={}
@@ -1416,38 +1424,41 @@ def Multi_AI():
                 if tank['id']==client.tank_id:
                     my_x=tank_x
                     my_y=tank_y
-                x=my_x+int(tank_width/2)
-                y=my_y+int(tank_height/2)
-                x1=tank_x+int(tank_width/2)
-                y1=tank_y+int(tank_height/2)
-                shot=False
-                direct=''                         
-                if x1==x:
-                    if y>y1:
-                        
-                        direct='DOWN'
-                        shot=True
-                    elif y<=y1:
-                        
-                        direct='UP'
-                        shot=True
-                elif y==y1:
-                    if x1>x:
-                        direct='RIGHT'
-                        
-                        shot=True
-                    elif x1<=x:
-                        direct='LEFT'
-                        
-                        shot=True 
+                x1=my_x
+                y1=my_y
+                x=tank_x
+                y=tank_y
+                
+                
+                if tank_id!=client.tank_id:
+                    for i in range(x1,x1+32):                       
+                            if x==i:
+                                if y>y1:
+                                    direct='UP'
+                                    shot=True
+                                elif y<=y1:
+                                    
+                                    direct='Down'
+                                    shot=True
+                    for i in range(y1,y1+32):
+                            if x==i:
+                                if x1>x:
+                                    direct='RIGHT'
+                                    
+                                    shot=True
+                                elif x1<=x:
+                                    direct='LEFT'
+                                    
+                                    shot=True 
+                client.turn_tank(client.token,direct) 
                 if shot==True:
-                    if ctimer%60==0:
+                    
                         pygame.mixer.Sound.stop(moves)
                         pygame.mixer.Sound.play(soundbullet)
                         client.fire_bullet(client.token) 
                         shot=False
-                             
-                client.turn_tank(client.token,direct) 
+                                
+                    
 
                 data[tank_id]=tank_score
                 data={k :v for k,v in sorted(data.items(),key=lambda item:item[1],reverse=True)}
