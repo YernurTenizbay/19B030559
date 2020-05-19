@@ -863,16 +863,8 @@ def Multi_tank():
     DOWN='DOWN'
     LEFT='LEFT'
     RIGHT='RIGHT'
-    MOVE_KEYS={
-        pygame.K_w: UP,
-        pygame.K_s: DOWN,
-        pygame.K_a: LEFT,
-        pygame.K_d: RIGHT
-    }
     SPACE='SPACE'
-    FIRE_KEYS={
-        pygame.K_SPACE: SPACE
-    }
+
     run=True
     gmg=False
     data={}
@@ -902,9 +894,15 @@ def Multi_tank():
                     
                     
                                       
-                if event.key in MOVE_KEYS:
-                    client.turn_tank(client.token,MOVE_KEYS[event.key])
-                if event.key in FIRE_KEYS:
+                if event.key == pygame.K_w:
+                    client.turn_tank(client.token,UP)
+                elif event.key == pygame.s:
+                    client.turn_tank(client.token,DOWN)
+                elif event.key == pygame.K_a:
+                    client.turn_tank(client.token,LEFT)
+                elif event.key == pygame.K_d:
+                    client.turn_tank(client.token,RIGHT)
+                if event.key == K_SPACE:
                     pygame.mixer.Sound.stop(moves)
                     pygame.mixer.Sound.play(soundbullet)
                     client.fire_bullet(client.token)
